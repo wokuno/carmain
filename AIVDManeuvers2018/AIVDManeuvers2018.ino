@@ -127,6 +127,9 @@ void loop()
   int rad = (tan(deg) / HEIGHT);
   int alpha = atan(HEIGHT/(rad + (WIDTH / 2)));
   int beta = atan(HEIGHT/(rad - (WIDTH / 2)));
+  if (rvm == 1){
+    
+  }else{
   if (abs(encoderFRAng - beta > 5)) {
       if (encoderFRAng > beta) {
         digitalWrite(DIR_R, LOW);
@@ -156,27 +159,13 @@ void loop()
         delayMicroseconds(width);
       }
     } 
-
-
+  }
   if(dir == 1){
   digitalWrite(dirControl,HIGH);
   }else{
     digitalWrite(dirControl,LOW);
   }
   analogWrite(pwmControl, per);
-    if(per < cur){
-    for (int i = cur; i > per; i--){
-      analogWrite(pwmControl, i);
-      delay(20);
-    }
-  }else if(per > cur){
-    for (int j = cur; j < per; j++){
-      analogWrite(pwmControl, j);
-      delay(20);
-    }
-  }else if(per == cur){
-    analogWrite(pwmControl, per);
-  }
     delay(tim);
 }
 //-------------------------------------------------------------
