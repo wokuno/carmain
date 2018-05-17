@@ -128,7 +128,13 @@ void loop()
   int alpha = atan(HEIGHT/(rad + (WIDTH / 2)));
   int beta = atan(HEIGHT/(rad - (WIDTH / 2)));
   if (rvm == 1){
-    
+    while(encoderRCAng < 90){
+    rearmotorCW();
+    }
+  }else if (encoderRCAng > 50) {
+    while(encoderRCAng > 0){
+      rearmotorCCW();
+    }
   }else{
   if (abs(encoderFRAng - beta > 5)) {
       if (encoderFRAng > beta) {
