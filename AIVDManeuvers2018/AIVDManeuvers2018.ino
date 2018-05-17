@@ -1,7 +1,7 @@
-#define encoderFRPinA  20
-#define encoderFRPinB  21
-#define encoderFLPinA  18
-#define encoderFLPinB  19
+#define encoderFRPinA  18
+#define encoderFRPinB  19
+#define encoderFLPinA  20
+#define encoderFLPinB  21
 #define encoderRCPinA  2
 #define encoderRCPinB  3
 #define motorSpeed 255
@@ -9,36 +9,35 @@
 #define pwmControl 12
 #define reardirControl 9
 #define rearpwmControl 8
-#define PULL 16
-#define DIRL 15
-#define ENAL 14
-#define PULR 5
-#define DIRR 6
-#define ENAR 7
-#define width 600
-#define angle 300
-#define opticalR A0
-#define opticalL A1
-#define opticalRear A2
+#define PULL 6
+#define DIRL 5
+#define ENAL 4
+#define PULR 7
+#define DIRR 10
+#define ENAR 11
+#define width 1200
+#define opticalR 0
+#define opticalL 1
+#define opticalRear 2
 #define button_ctr 35
 #define button_rear 39
 #define button_front 31
 #define HEIGHT 33
-#define WIDTH 24
+#define carwidth 24
 #define CPTF 1024
 #define CPTR 90
 
-volatile unsigned int encoderFRPos = 0;
-volatile unsigned int encoderFLPos = 0;
-volatile unsigned int encoderRCPos = 0;
-volatile unsigned int encoderFRAng = 0;
-volatile unsigned int encoderFLAng = 0;
-volatile unsigned int encoderRCAng = 0;
-volatile int tim = 0;
-volatile int deg = 0;
-volatile int dir = 0;
-volatile int per = 0;
-volatile int rwm = 0;
+unsigned int encoderFRPos = 0;
+unsigned int encoderFLPos = 0;
+unsigned int encoderRCPos = 0;
+unsigned int encoderFRAng = 0;
+unsigned int encoderFLAng = 0;
+unsigned int encoderRCAng = 0;
+int tim = 0;
+int deg = 0;
+int dir = 0;
+int per = 0;
+int rwm = 0;
 
 boolean newData = false;
 const byte numChars = 32;
@@ -48,27 +47,29 @@ char receivedChars[numChars];
 //SETUP
 //-------------------------------------------------------------
 void setup() {
+  Serial.begin (9600);
   pinMode (PULL, OUTPUT);      //left front pulse
   pinMode (PULR, OUTPUT);     //right front pulse
   pinMode (DIRL, OUTPUT);     //left front direction
   pinMode (DIRR, OUTPUT);     //right front direction
   pinMode (ENAL, OUTPUT);     //left front enable
   pinMode (ENAR, OUTPUT);     //right front enable
-  pinMode (31, INPUT);         //button to perform the drive motion of the car
-  pinMode(35, INPUT);          //button to turn the rear wheel CW to center it
-  pinMode(39, INPUT);          //button to turn the rear wheel CCW to center it
   pinMode (dirControl, OUTPUT);     //rear wheel turning direction pin
   pinMode(pwmControl, OUTPUT);      //rear wheel turning speed control pin
   pinMode(reardirControl, OUTPUT);  //rear wheel forward or backward direction pin
   pinMode(rearpwmControl, OUTPUT);  //rear wheel forward or backward speed control pin
   pinMode(encoderFRPinA, INPUT);
+  pinMode(encoderFRPinB, INPUT);
+  pinMode(encoderFLPinA, INPUT);
+  pinMode(encoderFLPinB, INPUT);
+  pinMode(encoderRCPinA, INPUT);
+  pinMode(encoderRCPinB, INPUT);
   pinMode(button_front, INPUT);       //button to perform the drive motion of the car
   pinMode(button_ctr, INPUT);          //button to turn the rear wheel CW to center it
   pinMode(button_rear, INPUT);         //button to turn the rear wheel CCW to center it
-  home();
-
-  Serial.begin (9600);
   Serial.println("start");                // a personal quirk
+  homer();
+  
   encoderFRPos = 0;
   encoderFLPos = 0;
   encoderRCPos = 0;
@@ -77,23 +78,27 @@ void setup() {
   encoderRCAng = 0;
 }
 
-void home() {
+void homer() {
   digitalWrite(DIRR, HIGH);
-  digitalWrite(DIRL, HIGH);
+  
   digitalWrite(ENAR, HIGH);
-  digitalWrite(ENAL, HIGH);
+  
   while (analogRead(opticalR) < 750) {
     digitalWrite(PULR, HIGH);
     delayMicroseconds(width);
     digitalWrite(PULR, LOW);
     delayMicroseconds(width);
   }
+
+  digitalWrite(DIRL, HIGH);
+  digitalWrite(ENAL, HIGH);
   while (analogRead(opticalL) < 750) {
     digitalWrite(PULL, HIGH);
     delayMicroseconds(width);
     digitalWrite(PULL, LOW);
     delayMicroseconds(width);
   }
+
   attachInterrupt(digitalPinToInterrupt(encoderFLPinA), doEncoderFLA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(encoderFLPinA), doEncoderFLB, CHANGE);
   attachInterrupt(digitalPinToInterrupt(encoderFRPinA), doEncoderFRA, CHANGE);
@@ -124,10 +129,12 @@ void loop()
   int cur = per;
   int rid = dir;
   recvWithStartEndMarkers();
-  int rad = (tan(deg) / HEIGHT);
-  int alpha = atan(HEIGHT/(rad + (WIDTH / 2)));
-  int beta = atan(HEIGHT/(rad - (WIDTH / 2)));
-  if (rvm == 1){
+  //int rad = (tan(deg) / HEIGHT);
+  //int alpha = atan(HEIGHT/(rad + (carwidth / 2)));
+  //int beta = atan(HEIGHT/(rad - (carwidth / 2)));
+  int alpha = deg;
+  int beta = deg;
+  if (rwm == 1){
     while(encoderRCAng < 90){
     rearmotorCW();
     }
@@ -136,42 +143,61 @@ void loop()
       rearmotorCCW();
     }
   }else{
-  if (abs(encoderFRAng - beta > 5)) {
-      if (encoderFRAng > beta) {
-        digitalWrite(DIR_R, LOW);
+      if (beta % encoderFRAng > 360 % encoderFRAng) {
+        digitalWrite(DIRR, LOW);
       }
-      if (encoderFRAng < beta) {
+      if (beta % encoderFRAng < 360 % encoderFRAng) {
         digitalWrite(DIRR, HIGH);
       }
-      while (encoderFRAng < beta) {
+      if (alpha % encoderFLAng > 360 % encoderFLAng) {
+        digitalWrite(DIRL, LOW);
+      }
+      if (alpha % encoderFLAng < 360 % encoderFLAng) {
+        digitalWrite(DIRL, HIGH);
+      }
+      if(dir == 1){
+      digitalWrite(dirControl,HIGH);
+      }else{
+        digitalWrite(dirControl,LOW);
+      }
+      analogWrite(pwmControl, per);
+      if(deg > 0){
+       while (encoderFRAng != beta || encoderFLAng != alpha) {
+        if(encoderFRAng != beta){
         digitalWrite(PULR, HIGH);
         delayMicroseconds(width);
         digitalWrite(PULR, LOW);
         delayMicroseconds(width);
-      }
-    }
-  
-    if (abs(encoderFLAng - alpha > 5)) {
-      if (encoderFLAng > alpha) {
-        digitalWrite(DIRL, LOW);
-      }
-      if (leftEnc < alpha) {
-        digitalWrite(DIRL, HIGH);
-      }
-      while (encoderFLAng < alpha) {
+        }
+        if(encoderFLAng != alpha){
         digitalWrite(PULL, HIGH);
         delayMicroseconds(width);
         digitalWrite(PULL, LOW);
         delayMicroseconds(width);
+        }
       }
-    } 
+      }else if(deg < 0){
+       while (encoderFRAng != (beta + 360) || encoderFLAng != (alpha + 360)) {
+        if(encoderFRAng != beta){
+        digitalWrite(PULR, HIGH);
+        delayMicroseconds(width);
+        digitalWrite(PULR, LOW);
+        delayMicroseconds(width);
+        }
+        if(encoderFLAng != alpha){
+        digitalWrite(PULL, HIGH);
+        delayMicroseconds(width);
+        digitalWrite(PULL, LOW);
+        delayMicroseconds(width);
+        }
+      }
+        
+      }
+      
+
+
   }
-  if(dir == 1){
-  digitalWrite(dirControl,HIGH);
-  }else{
-    digitalWrite(dirControl,LOW);
-  }
-  analogWrite(pwmControl, per);
+  
     delay(tim);
 }
 //-------------------------------------------------------------
@@ -222,20 +248,21 @@ void parseData() {
 
   strtokIndx = strtok(receivedChars, ","); //For how long
   tim = atoi(strtokIndx);
+  Serial.println(tim);
   
   strtokIndx = strtok(NULL,","); //deg of rotation
-  deg = ((atoi(strtokIndx)*255)/100); //0 -> 100
-  
+  deg = atoi(strtokIndx); //0 -> 100
+  Serial.println(deg);
   strtokIndx = strtok(NULL, ","); 
   dir = atoi(strtokIndx); //0-1
-  
+  Serial.println(dir);
   strtokIndx = strtok(NULL, ",");
   //deg = (((atoi(strtokIndx)+50)*500)/100)+1250; //-50 -> 50
   per =  ((atoi(strtokIndx)*255)/100); //0 -> 100
-
+  Serial.println(per);
   strtokIndx = strtok(NULL, ">"); 
   rwm = atoi(strtokIndx); //0-1 
-  
+  Serial.println(rwm);
 }
 
 
@@ -263,7 +290,7 @@ void parseData() {
 //Handles Count for Encoders
 //-------------------------------------------------------------
 
-void doEncoderFLA() {
+void doEncoderFRA() {
   if (digitalRead(encoderFRPinA) == HIGH) {
     if (digitalRead(encoderFRPinB) == LOW) {
       encoderFRPos++;
@@ -281,10 +308,10 @@ void doEncoderFLA() {
       encoderFRPos--;
     }
   }
-  encoderFRAng = (encoderFRPos % CPTF) * (360) / CPTF;
+  encoderFRAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
 }
 
-void doEncoderFLB() {
+void doEncoderFRB() {
   if (digitalRead(encoderFRPinB) == HIGH) {
     if (digitalRead(encoderFRPinA) == LOW) {
       encoderFRPos++;
@@ -302,7 +329,7 @@ void doEncoderFLB() {
       encoderFRPos--;
     }
   }
-  encoderFRAng = (encoderFRPos % CPTF) * (360) / CPTF;
+  encoderFRAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
 }
 void doEncoderFLA() {
   if (digitalRead(encoderFLPinA) == HIGH) {
@@ -322,7 +349,7 @@ void doEncoderFLA() {
       encoderFLPos--;
     }
   }
-  encoderFLAng = (encoderFLPos % CPTF) * (360) / CPTF;
+  encoderFLAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
 }
 
 void doEncoderFLB() {
@@ -343,7 +370,7 @@ void doEncoderFLB() {
       encoderFLPos--;
     }
   }
-  encoderFLAng = (encoderFLPos % CPTF) * (360) / CPTF;
+  encoderFLAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
 }
 
 void doEncoderRCA() {
@@ -385,7 +412,7 @@ void doEncoderRCB() {
       encoderRCPos--;
     }
   }
-  encoderRCAng = (encoderRCPos % CPTR) * (360) / CPTR;
+  encoderRCAng = (encoderRCPos % CPTR) * 360 / CPTR;
 }
 
 
