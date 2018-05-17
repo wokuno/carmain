@@ -15,7 +15,7 @@
 #define PULR 7
 #define DIRR 10
 #define ENAR 11
-#define width 1200
+#define width 600
 #define opticalR 0
 #define opticalL 1
 #define opticalRear 2
@@ -155,12 +155,7 @@ void loop()
       if (alpha % encoderFLAng < 360 % encoderFLAng) {
         digitalWrite(DIRL, HIGH);
       }
-      if(dir == 1){
-      digitalWrite(dirControl,HIGH);
-      }else{
-        digitalWrite(dirControl,LOW);
-      }
-      analogWrite(pwmControl, per);
+
       if(deg > 0){
        while (encoderFRAng != beta || encoderFLAng != alpha) {
         if(encoderFRAng != beta){
@@ -169,14 +164,17 @@ void loop()
         digitalWrite(PULR, LOW);
         delayMicroseconds(width);
         }
+        Serial.println(encoderFRAng);
         if(encoderFLAng != alpha){
         digitalWrite(PULL, HIGH);
         delayMicroseconds(width);
         digitalWrite(PULL, LOW);
         delayMicroseconds(width);
         }
+        Serial.println(encoderFLAng);
       }
-      }else if(deg < 0){
+      }
+      if(deg < 0){
        while (encoderFRAng != (beta + 360) || encoderFLAng != (alpha + 360)) {
         if(encoderFRAng != beta){
         digitalWrite(PULR, HIGH);
@@ -184,12 +182,14 @@ void loop()
         digitalWrite(PULR, LOW);
         delayMicroseconds(width);
         }
+        Serial.println(encoderFRAng);
         if(encoderFLAng != alpha){
         digitalWrite(PULL, HIGH);
         delayMicroseconds(width);
         digitalWrite(PULL, LOW);
         delayMicroseconds(width);
         }
+        Serial.println(encoderFLAng);
       }
         
       }
