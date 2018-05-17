@@ -263,91 +263,129 @@ void parseData() {
 //Handles Count for Encoders
 //-------------------------------------------------------------
 
-void doEncoderFRA() {
-  /* If pinA and pinB are both high or both low, it is spinning
-     forward. If they're different, it's going backward.
-
-     For more information on speeding up this process, see
-     [Reference/PortManipulation], specifically the PIND register.
-  */
-  if (digitalRead(encoderFRPinA) == digitalRead(encoderFRPinB)) {
-    encoderFRPos++;
-  } else {
-    encoderFRPos--;
+void doEncoderFLA() {
+  if (digitalRead(encoderFRPinA) == HIGH) {
+    if (digitalRead(encoderFRPinB) == LOW) {
+      encoderFRPos++;
+    }
+    else {
+      encoderFRPos--;
+    }
   }
-  encoderFRAng = (encoderFRPos % CPTF)*(360)/CPTF;
-
+  else
+  {
+    if (digitalRead(encoderFRPinB) == HIGH) {
+      encoderFRPos++;
+    }
+    else {
+      encoderFRPos--;
+    }
+  }
+  encoderFRAng = (encoderFRPos % CPTF) * (360) / CPTF;
 }
-void doEncoderFRB() {
-  /* If pinA and pinB are both high or both low, it is spinning
-     forward. If they're different, it's going backward.
 
-     For more information on speeding up this process, see
-     [Reference/PortManipulation], specifically the PIND register.
-  */
-  if (digitalRead(encoderFRPinA) == digitalRead(encoderFRPinB)) {
-    encoderFRPos++;
-  } else {
-    encoderFRPos--;
+void doEncoderFLB() {
+  if (digitalRead(encoderFRPinB) == HIGH) {
+    if (digitalRead(encoderFRPinA) == LOW) {
+      encoderFRPos++;
+    }
+    else {
+      encoderFRPos--;
+    }
   }
-  encoderFRAng = (encoderFRPos % CPTF)*(360)/CPTF;
+  else
+  {
+    if (digitalRead(encoderFRPinA) == HIGH) {
+      encoderFRPos++;
+    }
+    else {
+      encoderFRPos--;
+    }
+  }
+  encoderFRAng = (encoderFRPos % CPTF) * (360) / CPTF;
 }
 void doEncoderFLA() {
-  /* If pinA and pinB are both high or both low, it is spinning
-     forward. If they're different, it's going backward.
-
-     For more information on speeding up this process, see
-     [Reference/PortManipulation], specifically the PIND register.
-  */
-  if (digitalRead(encoderFLPinA) == digitalRead(encoderFLPinB)) {
-    encoderFLPos++;
-  } else {
-    encoderFLPos--;
+  if (digitalRead(encoderFLPinA) == HIGH) {
+    if (digitalRead(encoderFLPinB) == LOW) {
+      encoderFLPos++;
+    }
+    else {
+      encoderFLPos--;
+    }
   }
-  encoderFLAng = (encoderFLPos % CPTF)*(360)/CPTF;
+  else
+  {
+    if (digitalRead(encoderFLPinB) == HIGH) {
+      encoderFLPos++;
+    }
+    else {
+      encoderFLPos--;
+    }
+  }
+  encoderFLAng = (encoderFLPos % CPTF) * (360) / CPTF;
 }
+
 void doEncoderFLB() {
-  /* If pinA and pinB are both high or both low, it is spinning
-     forward. If they're different, it's going backward.
-
-     For more information on speeding up this process, see
-     [Reference/PortManipulation], specifically the PIND register.
-  */
-  if (digitalRead(encoderFLPinA) == digitalRead(encoderFLPinB)) {
-    encoderFLPos++;
-  } else {
-    encoderFLPos--;
+  if (digitalRead(encoderFLPinB) == HIGH) {
+    if (digitalRead(encoderFLPinA) == LOW) {
+      encoderFLPos++;
+    }
+    else {
+      encoderFLPos--;
+    }
   }
-  encoderFLAng = (encoderFLPos % CPTF)*(360)/CPTF;
-
+  else
+  {
+    if (digitalRead(encoderFLPinA) == HIGH) {
+      encoderFLPos++;
+    }
+    else {
+      encoderFLPos--;
+    }
+  }
+  encoderFLAng = (encoderFLPos % CPTF) * (360) / CPTF;
 }
+
 void doEncoderRCA() {
-  /* If pinA and pinB are both high or both low, it is spinning
-     forward. If they're different, it's going backward.
-
-     For more information on speeding up this process, see
-     [Reference/PortManipulation], specifically the PIND register.
-  */
-  if (digitalRead(encoderRCPinA) == digitalRead(encoderRCPinB)) {
-    encoderRCPos++;
-  } else {
-    encoderRCPos--;
+  if (digitalRead(encoderRCPinA) == HIGH) {
+    if (digitalRead(encoderRCPinB) == LOW) {
+      encoderRCPos++;
+    }
+    else {
+      encoderRCPos--;
+    }
   }
-  encoderRCAng = (encoderRCPos % CPTR)*(360)/CPTR;
+  else
+  {
+    if (digitalRead(encoderRCPinB) == HIGH) {
+      encoderRCPos++;
+    }
+    else {
+      encoderRCPos--;
+    }
+  }
+  encoderRCAng = (encoderRCPos % CPTR) * (360) / CPTR;
 }
-void doEncoderRCB() {
-  /* If pinA and pinB are both high or both low, it is spinning
-     forward. If they're different, it's going backward.
 
-     For more information on speeding up this process, see
-     [Reference/PortManipulation], specifically the PIND register.
-  */
-  if (digitalRead(encoderRCPinA) == digitalRead(encoderRCPinB)) {
-    encoderRCPos++;
-  } else {
-    encoderRCPos--;
+void doEncoderRCB() {
+  if (digitalRead(encoderRCPinB) == HIGH) {
+    if (digitalRead(encoderRCPinA) == LOW) {
+      encoderRCPos++;
+    }
+    else {
+      encoderRCPos--;
+    }
   }
-  encoderRCAng = (encoderRCPos % CPTR)*(360)/CPTR;
+  else
+  {
+    if (digitalRead(encoderRCPinA) == HIGH) {
+      encoderRCPos++;
+    }
+    else {
+      encoderRCPos--;
+    }
+  }
+  encoderRCAng = (encoderRCPos % CPTR) * (360) / CPTR;
 }
 
 
