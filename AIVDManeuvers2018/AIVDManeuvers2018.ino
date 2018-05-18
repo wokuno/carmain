@@ -37,7 +37,7 @@ int tim = 0;
 int deg = 0;
 int dir = 0;
 int per = 0;
-int rwm = 0;
+int rwm;
 
 boolean newData = false;
 const byte numChars = 32;
@@ -132,16 +132,19 @@ void loop()
   //int rad = (tan(deg) / HEIGHT);
   //int alpha = atan(HEIGHT/(rad + (carwidth / 2)));
   //int beta = atan(HEIGHT/(rad - (carwidth / 2)));
+  Serial.println(rwm);
   int alpha = deg;
   int beta = deg;
   if (rwm == 1){
-    while(encoderRCAng < 90){
+    while(encoderRCPos < 75){
     rearmotorCW();
+    analogWrite(rearpwmControl, 0);
     }
-  }else if (encoderRCAng > 50) {
-    while(encoderRCAng > 0){
-      rearmotorCCW();
-    }
+  }else if (rwm == 0) {
+  digitalWrite(reardirControl, HIGH);
+  analogWrite(rearpwmControl, motorSpeed);
+  while (analogRead(opticalRear) < 750) {}
+  analogWrite(rearpwmControl, 0);
   }else{
       if (beta % encoderFRAng > 360 % encoderFRAng) {
         digitalWrite(DIRR, LOW);
@@ -253,13 +256,16 @@ void parseData() {
   strtokIndx = strtok(NULL,","); //deg of rotation
   deg = atoi(strtokIndx); //0 -> 100
   Serial.println(deg);
+  
   strtokIndx = strtok(NULL, ","); 
   dir = atoi(strtokIndx); //0-1
   Serial.println(dir);
+  
   strtokIndx = strtok(NULL, ",");
   //deg = (((atoi(strtokIndx)+50)*500)/100)+1250; //-50 -> 50
   per =  ((atoi(strtokIndx)*255)/100); //0 -> 100
   Serial.println(per);
+  
   strtokIndx = strtok(NULL, ">"); 
   rwm = atoi(strtokIndx); //0-1 
   Serial.println(rwm);
@@ -273,16 +279,15 @@ void parseData() {
   void rearmotorCW()      //rearwheel clockwise
   {
       digitalWrite(reardirControl, LOW);
-  analogWrite(rearpwmControl, abs(deg));
+  analogWrite(rearpwmControl, motorSpeed);
   delay(10);
+  Serial.println(encoderRCPos);
   }
 
   void rearmotorCCW()     //rearwheel counterclockwise
   {
-  if( deg > 0){
-      digitalWrite(reardirControl, HIGH);
-    }
-  analogWrite(rearpwmControl, abs(deg));
+  digitalWrite(reardirControl, HIGH);
+  analogWrite(rearpwmControl, motorSpeed);
   delay(10);
   }
   
@@ -391,7 +396,7 @@ void doEncoderRCA() {
       encoderRCPos--;
     }
   }
-  encoderRCAng = (encoderRCPos % CPTR) * (360) / CPTR;
+  
 }
 
 void doEncoderRCB() {
@@ -412,7 +417,7 @@ void doEncoderRCB() {
       encoderRCPos--;
     }
   }
-  encoderRCAng = (encoderRCPos % CPTR) * 360 / CPTR;
+  
 }
 
 
