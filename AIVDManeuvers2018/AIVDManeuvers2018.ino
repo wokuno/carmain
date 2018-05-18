@@ -313,6 +313,7 @@ void doEncoderFRA() {
     }
   }
   encoderFRAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
+  //encoderFRAng = encoderFRPos * CPTF % 360;
 }
 
 void doEncoderFRB() {
@@ -334,6 +335,7 @@ void doEncoderFRB() {
     }
   }
   encoderFRAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
+  //encoderFRAng = encoderFRPos * CPTF % 360;
 }
 void doEncoderFLA() {
   if (digitalRead(encoderFLPinA) == HIGH) {
@@ -354,6 +356,7 @@ void doEncoderFLA() {
     }
   }
   encoderFLAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
+  //encoderFLAng = encoderFLPos * CPTF % 360;
 }
 
 void doEncoderFLB() {
@@ -375,6 +378,7 @@ void doEncoderFLB() {
     }
   }
   encoderFLAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
+  //encoderFLAng = encoderFLPos * CPTF % 360;
 }
 
 void doEncoderRCA() {
