@@ -24,7 +24,7 @@
 #define button_front 31
 #define HEIGHT 33
 #define carwidth 24
-#define CPTF 1024
+#define CPTF 3072
 #define CPTR 90
 
 unsigned int encoderFRPos = 0;
@@ -37,7 +37,7 @@ int tim = 0;
 int deg = 0;
 int dir = 0;
 int per = 0;
-int rwm;
+int rwm = NULL;
 
 boolean newData = false;
 const byte numChars = 32;
@@ -132,7 +132,6 @@ void loop()
   //int rad = (tan(deg) / HEIGHT);
   //int alpha = atan(HEIGHT/(rad + (carwidth / 2)));
   //int beta = atan(HEIGHT/(rad - (carwidth / 2)));
-  Serial.println(rwm);
   int alpha = deg;
   int beta = deg;
   if (rwm == 1){
@@ -140,12 +139,13 @@ void loop()
     rearmotorCW();
     analogWrite(rearpwmControl, 0);
     }
-  }else if (rwm == 0) {
+  }else if (rwm == 2) {
   digitalWrite(reardirControl, HIGH);
   analogWrite(rearpwmControl, motorSpeed);
   while (analogRead(opticalRear) < 750) {}
   analogWrite(rearpwmControl, 0);
   }else{
+    //THIS SECTION NEEDS TO BE UPDATED - BEGIN UPDATE SECTION
       if (beta % encoderFRAng > 360 % encoderFRAng) {
         digitalWrite(DIRR, LOW);
       }
@@ -158,7 +158,7 @@ void loop()
       if (alpha % encoderFLAng < 360 % encoderFLAng) {
         digitalWrite(DIRL, HIGH);
       }
-
+      //END UPDATE SECTION
       if(deg > 0){
        while (encoderFRAng != beta || encoderFLAng != alpha) {
         if(encoderFRAng != beta){
@@ -281,7 +281,6 @@ void parseData() {
       digitalWrite(reardirControl, LOW);
   analogWrite(rearpwmControl, motorSpeed);
   delay(10);
-  Serial.println(encoderRCPos);
   }
 
   void rearmotorCCW()     //rearwheel counterclockwise
@@ -313,7 +312,7 @@ void doEncoderFRA() {
       encoderFRPos--;
     }
   }
-  encoderFRAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
+  encoderFRAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
 }
 
 void doEncoderFRB() {
@@ -334,7 +333,7 @@ void doEncoderFRB() {
       encoderFRPos--;
     }
   }
-  encoderFRAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
+  encoderFRAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
 }
 void doEncoderFLA() {
   if (digitalRead(encoderFLPinA) == HIGH) {
@@ -354,7 +353,7 @@ void doEncoderFLA() {
       encoderFLPos--;
     }
   }
-  encoderFLAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
+  encoderFLAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
 }
 
 void doEncoderFLB() {
@@ -375,7 +374,7 @@ void doEncoderFLB() {
       encoderFLPos--;
     }
   }
-  encoderFLAng = map(abs(encoderFRPos % CPTF),0,1023,0,360);
+  encoderFLAng = map(abs(encoderFRPos % CPTF),0,CPTF,0,360);
 }
 
 void doEncoderRCA() {
